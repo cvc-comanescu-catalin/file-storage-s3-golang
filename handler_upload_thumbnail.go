@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -31,7 +32,6 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-
 	fmt.Println("uploading thumbnail for video", videoID, "by user", userID)
 
 	const maxMemory = 10 << 20
@@ -45,9 +45,14 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	}
 	defer file.Close()
 
-	fileMediaType := fileHeader.Header.Get("Content-Type")
-	if fileMediaType == "" {
+	fileMediaType, _, err := mime.ParseMediaType(fileHeader.Header.Get("Content-Type"))
+	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Unable to get form file media type", err)
+		return
+	}
+
+	if fileMediaType != "image/jpeg" && fileMediaType != "image/png" {
+		respondWithError(w, http.StatusBadRequest, "Unsupported file type", err)
 		return
 	}
 
