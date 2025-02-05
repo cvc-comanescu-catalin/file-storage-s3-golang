@@ -65,6 +65,8 @@ go run .
 - You should see a link in your console to open the local web page.
 
 
+\\wsl$
+
 POST /api/login
 Request Body:
 {
