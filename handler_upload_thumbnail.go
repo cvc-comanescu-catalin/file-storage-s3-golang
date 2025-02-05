@@ -6,7 +6,6 @@ import (
 	"mime"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/bootdotdev/learn-file-storage-s3-golang-starter/internal/auth"
 	"github.com/google/uuid"
@@ -67,25 +66,27 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	assetFileName := videoIDString + filepath.Ext(fileHeader.Filename)
-	assetFilePath := filepath.Join(cfg.assetsRoot, assetFileName)
-	assetFile, err := os.Create(assetFilePath)
+	assetPath := getAssetPath(videoID, fileMediaType)
+	assetDiskPath := cfg.getAssetDiskPath(assetPath)
+
+	assetFile, err := os.Create(assetDiskPath)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Something is wrong", err)
+		respondWithError(w, http.StatusInternalServerError, "Unable to create file on server", err)
 		return
 	}
+	defer assetFile.Close()
 
 	if _, err := io.Copy(assetFile, file); err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Something is wrong", err)
 		return
 	}
 
-	newThumbnailDataURL := fmt.Sprintf("http://localhost:%s/assets/%s", cfg.port, assetFileName)
+	newThumbnailDataURL := cfg.getAssetURL(assetPath)
 	video.ThumbnailURL = &newThumbnailDataURL
 
 	err = cfg.db.UpdateVideo(video)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Something is wrong", err)
+		respondWithError(w, http.StatusInternalServerError, "Couldn't update video", err)
 		return
 	}
 
