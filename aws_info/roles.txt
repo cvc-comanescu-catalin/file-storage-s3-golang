@@ -1,0 +1,18 @@
+Roles
+Now that we have a policy for the tubely app, we need a role to attach it to.
+
+Assignment
+Navigate to the roles section of the IAM console
+Create a new role called tubely-app
+Its trusted entity should be AWS service
+Its use case should be EC2
+Attach the tubely-s3 policy to it
+Now, we’re not actually going to launch an EC2 instance (which is just Amazon’s name for their basic virtual server) in this course. But the next step would be to simply launch an EC2 instance and attach the tubely-app role to it. Then the code running on that server would have the permissions defined in the tubely-s3 policy!
+
+Run and submit the tests.
+
+aws iam list-roles --no-cli-pager
+
+Expecting stdout to contain all of:
+"RoleName": "tubely-app"
+"Service": "ec2.amazonaws.com"

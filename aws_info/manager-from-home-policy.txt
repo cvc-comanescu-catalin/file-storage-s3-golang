@@ -1,0 +1,16 @@
+Open the AWS IAM dashboard by clicking the link, or by searching “IAM” in the AWS console search bar.
+Go to the policies tab, and create a new policy.
+Set permissions to json file
+
+Call the policy manager-from-home
+Remove the admin policy from the managers group and add the manager-from-home policy. Because we set your user to be in the managers group, you should now have the new policy.
+Try to use the CLI to upload a file.
+aws s3 cp <local_file_path> s3://<bucket_name>
+
+You should get denied because your IP address is not allowed (your address isn’t 0.0.0.0)
+
+Update the policy and replace 0.0.0.0 with your current IP address. (Keep the /32 at the end, it tells AWS that you want an exact match on the IP address)
+Try to upload a file again. Now it should work!
+
+
+aws iam list-attached-group-policies --group-name managers

@@ -73,3 +73,19 @@ Request Body:
   "email": "admin@tubely.com",
   "password": "password"
 }
+
+
+
+https://tubely-42222.s3.eu-west-3.amazonaws.com/boots-image-horizontal.png
+
+
+
+AWS S3 Go SDK
+go get github.com/aws/aws-sdk-go-v2/service/s3 github.com/aws/aws-sdk-go-v2/config
+
+ aws s3api head-object --bucket tubely-42222 --key HjUVe25qCZWT-7OBM7gQf7B_qP-ROTSV-PJISYtpKko.mp4 > /tmp/object_metadata.txt
+
+
+whatis my ip
+nslookup myip.opendns.com. resolver1.opendns.com
+5.12.14.114

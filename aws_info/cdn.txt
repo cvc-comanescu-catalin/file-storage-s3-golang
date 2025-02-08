@@ -1,0 +1,75 @@
+CDNs
+A Content Delivery Network (CDN) is a (typically global) network of servers that caches and delivers content to users based on their geographic location.
+
+When we give users a URL to an S3 object, they’ll download that object from the S3 service in the region that our bucket lives in (for me, that’s us-east-2, near Ohio in the USA).
+
+If a user in Australia tries to download that object, they’re going to have to wait for the data to travel from Ohio to Australia… and that’s a long way! A CDN, like AWS CloudFront, can help with that. It takes a static asset, like an image or video, and caches it on servers all over the world. When a user requests the asset, they get it from the server closest to them, which is much faster.
+
+CDN visual
+
+In the example above, the “origin” server is an S3 bucket, and the “edge” servers are CloudFront servers. The origin is in the US, and whenever it updates, the edge servers update their caches. Then, when a user connects in Australia, they get the copy of the asset from the edge server in Australia. Much faster!
+
+Assignment
+Let’s stand up a CloudFront distribution in front of our S3 bucket.
+
+Navigate to the CloudFront section of the AWS console and click “Create Distribution”
+Choose your private S3 bucket as the origin
+You don’t need an origin path
+Leave the default name
+Use “origin access control settings” and create a new OAC, use the default settings for the OAC
+Leave origin shield off, and leave the additional settings as default
+In “Default Cache Behavior Settings” let’s update a couple of things:
+Set “HTTPS Only”
+Allow GET, HEAD, and OPTIONS
+Under Web Application Firewall (WAF) do not enable security protections
+Create the distribution
+I’m not going to cover every possible configuration option here, read the AWS documentation if you’re interested. My goal is to cover the important stuff from a conceptual standpoint.
+
+Once the distribution is created, you should see a big yellow banner alerting you that the S3’s bucket policy needs to be updated. Click the link in the banner to copy the policy to your clipboard. If you can’t find it, it should be something like this:
+{
+  "Version": "2008-10-17",
+  "Id": "PolicyForCloudFrontPrivateContent",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontServicePrincipal",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::BUCKETNAME/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "CLOUDFRONT_ARN"
+        }
+      }
+    }
+  ]
+}
+Copy icon
+Where BUCKETNAME is your bucket name and CLOUDFRONT_ARN is the ARN of your CloudFront distribution.
+
+Go back to your S3 bucket and click on the “Permissions” tab. Click “Bucket Policy” and “edit”. Paste the policy you copied earlier. Click “Save”.
+Manually find an object in your S3 bucket (upload one if you don’t have one). Copy the object’s URL and paste it into your browser: it should give you a permissions error. Good! That means your bucket can’t be accessed directly.
+Go back to CloudFront and copy your distribution’s domain name. It should look something like this: https://dkdi1medkine9a.cloudfront.net. Update the URL of the object you pasted into your browser to use the CloudFront domain instead of the S3 domain. It should look something like this when you’re done: https://dkdi1medkine9a.cloudfront.net/landscape/5n4K7uoEJ-dffddffdfsdfsdf.mp4. You should be able to load that URL in the browser and see the object! Congrats, you’re hitting an edge server now!
+Run and submit the tests after ensuring that the distribution is fully deployed (you might be able to access the object while CloudFront is still deploying the distribution to all edge locations).
+
+
+
+
+
+
+private object url
+https://tubely-private-42222.s3.eu-west-3.amazonaws.com/portrait/eAuuPOS0i6m0H4W4_7BavMmQ7qLbXkm4cRHub0CLoZc.mp4
+CloudFront distribution URL
+https://d3tpiizo5h3sax.cloudfront.net/portrait/eAuuPOS0i6m0H4W4_7BavMmQ7qLbXkm4cRHub0CLoZc.mp4
+
+
+
+
+tests
+aws cloudfront list-distributions --no-cli-pager
+Expecting stdout to contain all of:
+"Status": "Deployed"
+cloudfront.net
+s3

@@ -1,0 +1,16 @@
+Scoping Permission
+A critical rule of thumb in cyber security is the principle of least privilege: You should allow the fewest permissions possible that can still get the job done.
+
+For example, your user is in the “manager” group which we gave “full admin access” to. Especially at smaller companies, it’s common for folks to have more permissions than they truly need, usually for the sake of speed and convenience.
+
+But that’s not the most secure way to do things.
+
+
+
+Create a new policy in the IAM center named tubely-s3
+Set permissions to json file
+
+Replace tubely-123456 with your bucket name. You can get the Amazon Resource Name (ARN) of your bucket in the S3 console.
+
+Confirm it exists with the AWS CLI.
+aws iam list-policies --scope Local --no-cli-pager

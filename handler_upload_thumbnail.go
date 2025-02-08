@@ -82,7 +82,7 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	defer assetFile.Close()
 
 	if _, err := io.Copy(assetFile, file); err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Something is wrong", err)
+		respondWithError(w, http.StatusInternalServerError, "Unable to create file on server", err)
 		return
 	}
 
