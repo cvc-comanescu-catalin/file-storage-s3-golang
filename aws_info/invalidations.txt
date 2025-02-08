@@ -1,0 +1,23 @@
+Invalidations
+A CDN is a massive, globally distributed cache. Sure, we get massive performance improvements, because users that are geographically close to an edge server can download assets much faster than if they had to travel to the origin server.
+
+But what happens when we update an asset? How long does it take the edge servers to update their versions? The answer is: it depends. That’s always the tradeoff with cache - you need to deal with invalidations. Luckily CloudFront makes it fairly easy to force invalidations of the cache.
+
+Assignment
+Navigate to your CloudFront distribution in the AWS console and click on the “Invalidations” tab.
+An invalidation is a request to remove an object from the cache. That means the next time a user requests the object, the edge server will have to go back to the origin server to get the latest version. That means it will be slower for the first user, but fast again for subsequent users.
+
+You already know what stale caches look like, so I’ll spare you the demonstration. But just know that if you’re having issues with stale content, creating an invalidation is the way to fix it. Let’s create one, just for fun.
+
+Create an invalidation for the /landscape/* path. This will remove all objects in the /landscape/ directory from the cache.
+Run aws cloudfront list-invalidations --distribution-id YOUR_DISTRIBUTION_ID to see the status of your invalidation
+Once it’s in a Completed state, run it again, but redirect the output to a temporary file:
+aws cloudfront list-invalidations --distribution-id YOUR_DISTRIBUTION_ID > /tmp/invalidations.json
+Copy icon
+Run and submit the CLI tests.
+
+
+
+
+
+aws cloudfront list-invalidations --distribution-id E4IE5E01CPMHL > /tmp/invalidations.json
